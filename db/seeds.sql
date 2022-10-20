@@ -23,5 +23,5 @@ VALUES
     ("Leonel", "Messi", 4, 3),
     ("Christiano", "Ronaldo", 5, NULL),
     ("Chevy", "Chase", 6, 5),
-    ("Mark", "Walberg", 7, NULL),
+    ("Mark", "Wahlberg", 7, NULL),
     ("Denzel", "Washington", 8, 7);
