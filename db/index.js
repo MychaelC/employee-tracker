@@ -389,5 +389,39 @@ class Employee {
         });
     };
 
+    viewbyDept() {
+        const query = "View employees by department";
+        const baseQuery = `SELECT e1.id AS EMPID, e1.first_name AS FName, e1.last_name AS LName, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e2.first_name, " ", e2.last_name) AS Manager
+        FROM employee AS e1
+        LEFT JOIN role on e1.role_id = role.id
+        LEFT JOIN department ON role.department_id = department.id
+        LEFT JOIN employee AS e2 ON e2.id=e1.manager_id
+        ORDER BY department ASC;`;
+        const queryOpt2 = `SELECT e.first_name, e.last_name, r.title, r.salary,
+        CONCAT(e1.first_name, " ", e1.last_name) as manager
+        FROM employee e
+        INNER JOIN role r ON e.role_id = r.id
+        LEFT JOIN employee e1 ON e.manager_id = e1.id
+        WHERE r.department_id = ?`;
 
+        console.log(query);
+    };
+    viewbyManager() {
+        const query = "View employees by manager";
+        const queryOpt1 = `SELECT CONCAT(e2.first_name, " ", e2.last_name) AS Manager, e1.id AS EMPID, e1.first_name AS FName, e1.last_name AS LName, role.title AS Title, department.name AS Department, role.salary AS Salary
+        
+        FROM employee AS e1
+        LEFT JOIN role on e1.role_id = role.id
+        LEFT JOIN department ON role.department_id = department.id
+        INNER JOIN employee AS e2 ON e2.id=e1.manager_id
+        ORDER BY department ASC;`;
+        const queryOpt2 = `SELECT e.first_name, e.last_name, r.title, r.salary,
+        CONCAT(e1.first_name, " ", e1.last_name) as manager
+        FROM employee e
+        INNER JOIN role r ON e.role_id = r.id
+        LEFT JOIN employee e1 ON e.manager_id = e1.id
+        WHERE r.department_id = ?`;
+
+        console.log(query);
+    };
     }
