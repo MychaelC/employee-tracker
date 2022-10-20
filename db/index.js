@@ -246,53 +246,53 @@ class Role {
     };
 
 
-updateRoleDepartment() {
-    inquirer.prompt([
-        {
-            name: "id",
-            type: "input",
-            message: "What is the id of the role you would like to update?"
-        },
-        {
-            name: "department_id",
-            type: "input",
-            message: "What is the ID of the department you would like to designate the role to?"
-        }
-    ]).then(data => {
-        const query = "UPDATE role SET ? WHERE ?";
-        const values = [
-            { department_id: data.department_id },
-            { id: data.id }
-        ];
+    updateRoleDepartment() {
+        inquirer.prompt([
+            {
+                name: "id",
+                type: "input",
+                message: "What is the id of the role you would like to update?"
+            },
+            {
+                name: "department_id",
+                type: "input",
+                message: "What is the ID of the department you would like to designate the role to?"
+            }
+        ]).then(data => {
+            const query = "UPDATE role SET ? WHERE ?";
+            const values = [
+                { department_id: data.department_id },
+                { id: data.id }
+            ];
 
-        connection.query(query, values, (err, res) => {
-            if (err) throw err;
-            //if successful
-            console.log("You have updated a role's department!");
+            connection.query(query, values, (err, res) => {
+                if (err) throw err;
+                //if successful
+                console.log("You have updated a role's department!");
+            });
         });
-    });
-};
+    };
 
-//Delete Role
-deleteRole() {
-    inquirer.prompt([
-        {
-            name: "id",
-            type: "input",
-            message: "What is the id of the role you would like to delete?"
-        },
-    ]).then(data => {
-        const query = "UPDATE FROM role WHERE ?";
-        const values = 
-            { id: data.id };
+    //Delete Role
+    deleteRole() {
+        inquirer.prompt([
+            {
+                name: "id",
+                type: "input",
+                message: "What is the id of the role you would like to delete?"
+            },
+        ]).then(data => {
+            const query = "UPDATE FROM role WHERE ?";
+            const values =
+                { id: data.id };
 
-        connection.query(query, values, (err, res) => {
-            if (err) throw err;
-            //if successful
-            console.log("You have deleted a role from the database!");
+            connection.query(query, values, (err, res) => {
+                if (err) throw err;
+                //if successful
+                console.log("You have deleted a role from the database!");
+            });
         });
-    });
-};
+    };
 };
 
 class Employee {
@@ -333,8 +333,8 @@ class Employee {
                 last_name: data.last_name,
                 role_id: data.role_id,
                 manager_id: data.manager_id
-                };
-    
+            };
+
             connection.query(query, values, (err, res) => {
                 if (err) throw err;
                 //if successful
@@ -367,24 +367,24 @@ class Employee {
                 this.viewbyDept;
                 break;
             case "View employees by role":
-            this.viewbyRole;
+                this.viewbyRole;
                 break;
             case "View employees by manager":
                 this.viewbyManager;
                 break;
             case "Back":
-                default:
-                    mainPrompt()
-                    console.log("Trying to return to main page");
+            default:
+                mainPrompt()
+                console.log("Trying to return to main page!");
         }
     };
 
     viewAllEmployees() {
         const query = "SELECT * FROM employee";
-        connection.query(query,(err, res) => {
+        connection.query(query, (err, res) => {
             if (err) throw err;
 
-            const table =empTable.getTable(res);
+            const table = empTable.getTable(res);
             console.log(table);
         });
     };
@@ -424,4 +424,238 @@ class Employee {
 
         console.log(query);
     };
+
+    viewbyRole() {
+        const query = "View employees by role";
+        console.log(query);
+    };
+
+    //Employee update
+    updateEmployee() {
+        inquirer.prompt({
+            name: "employeeOptions",
+            type: "rawlist",
+            message: "What would you like to do?",
+            choices: [
+                "Update employee name",
+                "Update employee's role",
+                "Update employee's manager",
+                "Back"
+            ]
+        }).then(onUpdateEmployee);
+    };
+
+    onUpdateEmployee({ employeeOptions }) {
+        switch (employeeOptions) {
+            case "Update employee name":
+                this.updateName();
+                break;
+            case "Update employee's role":
+                this.updateRole();
+                break;
+            case "Update employee's manager":
+                this.updateManager();
+                break;
+            case "Back":
+            default:
+                mainPrompt();
+                console.log("Trying to return to main page!");
+        }
     }
+
+    updateName() {
+        inquirer.prompt([
+            {
+                name: "id",
+                type: "input",
+                message: "What is the ID of the employee you would like to update?",
+            },
+            {
+                name: "first_name",
+                type: "input",
+                message: "Update first name: ",
+            },
+            {
+                name: "last_name",
+                type: "input",
+                message: "Update last name: ",
+            },
+        ]).then(data => {
+            const query = "UPDATE employee SET ? WHERE ?";
+            const values = [
+                {
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                },
+                { id: data.id }
+            ];
+
+            connection.query(query, values, (err, res) => {
+                if (err) throw err;
+
+                //If successful
+                console.log("You have updated and employee's name!");
+            });
+        });
+    };
+
+    updateRole() {
+        inquirer.prompt([
+            {
+                name: "id",
+                type: "input",
+                message: "What is the ID of the employee you would like to update?",
+            },
+            {
+                name: "role_id",
+                type: "input",
+                message: "What is the ID of the role you would like to update to?",
+            }
+        ]).then(data => {
+            const query = "UPDATE employee SET ? WHERE ?";
+            const values = [
+                { role_id: data.role_id },
+                { id: data.id }
+            ];
+
+            connection.query(query, values, (err, res) => {
+                if (err) throw err;
+
+                //If successful
+                console.log("You have updated the employee's role!");
+            });
+        })
+    }
+    updateManager() {
+        inquirer.prompt([
+            {
+                name: "id",
+                type: "input",
+                message: "What is the ID of the employee you would like to update?",
+            },
+            {
+                name: "manager_id",
+                type: "input",
+                message: "Update to manager with ID: ",
+            }
+        ]).then(data => {
+            const query = "UPDATE employee SET ? WHERE ?";
+            const values = [
+                { manager_id: data.manager_id },
+                { id: data.id }
+            ];
+
+            connection.query(query, values, (err, res) => {
+                if (err) throw err;
+
+                //If successful
+                console.log("You have updated and employee's manager!");
+            });
+        });
+    }
+    deleteEmployee() {
+        inquirer.prompt([
+            {
+                name: "id",
+                type: "input",
+                message: "What is the ID of the employee you would like to delete?",
+            }
+        ]).then(data => {
+            const query = "DELETE FROM employee WHERE ?";
+            const values = { id: data.id };
+
+            connection.query(query, values, (err, res) => {
+                if (err) throw err;
+
+                //If successful
+                console.log("You have deleted an employee from the dataase!");
+            })
+        })
+    }
+};
+//init logic to initialize database
+function start() {
+    mainPrompt();
+};
+
+function mainPrompt() {
+    inquirer.prompt({
+        name: "action",
+        type: "rawlist",
+        message: "What would you like to do?",
+        choices: [
+            "View all departments",
+            "View all roles",
+            "View employee details",
+            "Update existing departments",
+            "Update existing roles",
+            "Update existing employees",
+            "Add department",
+            "Add role",
+            "Add employee",
+            "Delete department",
+            "Delete role",
+            "Delete employee",
+            "Exit"
+        ]
+    }).then(onMainPromptAnswer);
+};
+
+function onMainPromptAnswer({ action }) {
+    switch (action) {
+        case "View all departments":
+            department.viewDepartments();
+            mainPrompt();
+            break;
+        case "View all roles":
+            role.viewRoles();
+            mainPrompt();
+            break;
+        case "View employee details":
+            employee.viewEmployees();
+            mainPrompt();
+            break;
+        case "Update existing departments":
+            department.updateDepartment();
+            mainPrompt();
+            break;
+        case "Update existing roles":
+            role.updateRole();
+            mainPrompt();
+            break;
+        case "Update existing employees":
+            employee.updateEmployee();
+            mainPrompt();
+            break;
+        case "Add department":
+            department.addDepartment();
+            mainPrompt();
+            break;
+        case "Add role":
+            role.addRole();
+            mainPrompt();
+            break;
+        case "Add employee":
+            employee.addEmployee();
+            mainPrompt();
+            break;
+        case "Delete department":
+            department.deleteDepartment();
+            mainPrompt();
+            break;
+        case "Delete role":
+            role.deleteRole();
+            mainPrompt();
+            break;
+        case "Delete employee":
+            employee.deleteEmployee();
+            mainPrompt();
+            break;
+        case "Exit":
+            default:
+                console.log("Goodbye!")
+                connection.end();
+    };
+};
+
+module.exports = { start: start,};
