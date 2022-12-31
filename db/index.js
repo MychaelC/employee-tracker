@@ -1,13 +1,10 @@
 // Establish connections/dependencies
-const connection = require("connection");
+const connection = require("./connection");
 const inquirer = require("inquirer");
 const empTable = require("console.table");
 const { table } = require("console");
 
 //Let db new department, role, employee
-let department = new Department("name"); //
-let role = new Role(title, salary, department_id);
-let employee = new Employee(first_name, last_name, role_id, manager_id);
 
 //class db file
 class DB {
@@ -37,12 +34,12 @@ class Department {
 
             connection.query(query, values, (err, res) => {
                 if (err) throw err;
-                //if Successful
+                //if Successful log
                 console.log("New Department added to database");
             });
         });
     };
-    // View 
+    // View Departments
     viewDepartments() {
         const query = "SELECT * FROM department";
 
@@ -105,6 +102,8 @@ class Department {
         });
     };
 }
+let department = new Department("name");
+
 // Class Roles
 class Role {
     constructor(title, salary, department_id) {
@@ -301,6 +300,7 @@ class Employee {
         this.last_name = last_name;
         this.role_id = role_id;
         this.manager_id = manager_id;
+        this.onViewEmployees = this.onViewEmployees.bind (this)
     }
 
     //Create Employee
@@ -346,7 +346,7 @@ class Employee {
     viewEmployees() {
         inquirer.prompt({
             name: "byType",
-            type: "rawlist",
+            type: "list",
             message: "What would you like to do?",
             choices: [
                 "View all employees",
@@ -355,7 +355,7 @@ class Employee {
                 "View employees by manager",
                 "Back"
             ]
-        }).then(onViewEmployees);
+        }).then(this.onViewEmployees);
     };
 
     onViewEmployees({ byType }) {
@@ -364,13 +364,13 @@ class Employee {
                 this.viewAllEmployees;
                 break;
             case "View employees by department":
-                this.viewbyDept;
+                this.viewbyDept();
                 break;
             case "View employees by role":
-                this.viewbyRole;
+                this.viewbyRole();
                 break;
             case "View employees by manager":
-                this.viewbyManager;
+                this.viewbyManager();
                 break;
             case "Back":
             default:
@@ -389,41 +389,41 @@ class Employee {
         });
     };
 
-    viewbyDept() {
-        const query = "View employees by department";
-        const baseQuery = `SELECT e1.id AS EMPID, e1.first_name AS FName, e1.last_name AS LName, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e2.first_name, " ", e2.last_name) AS Manager
-        FROM employee AS e1
-        LEFT JOIN role on e1.role_id = role.id
-        LEFT JOIN department ON role.department_id = department.id
-        LEFT JOIN employee AS e2 ON e2.id=e1.manager_id
-        ORDER BY department ASC;`;
-        const queryOpt2 = `SELECT e.first_name, e.last_name, r.title, r.salary,
-        CONCAT(e1.first_name, " ", e1.last_name) as manager
-        FROM employee e
-        INNER JOIN role r ON e.role_id = r.id
-        LEFT JOIN employee e1 ON e.manager_id = e1.id
-        WHERE r.department_id = ?`;
+    // viewbyDept() {
+    //     const query = "View employees by department";
+    //     const baseQuery = `SELECT e1.id AS EMPID, e1.first_name AS FName, e1.last_name AS LName, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e2.first_name, " ", e2.last_name) AS Manager
+    //     FROM employee AS e1
+    //     LEFT JOIN role on e1.role_id = role.id
+    //     LEFT JOIN department ON role.department_id = department.id
+    //     LEFT JOIN employee AS e2 ON e2.id=e1.manager_id
+    //     ORDER BY department ASC;`;
+    //     const queryOpt2 = `SELECT e.first_name, e.last_name, r.title, r.salary,
+    //     CONCAT(e1.first_name, " ", e1.last_name) as manager
+    //     FROM employee e
+    //     INNER JOIN role r ON e.role_id = r.id
+    //     LEFT JOIN employee e1 ON e.manager_id = e1.id
+    //     WHERE r.department_id = ?`;
 
-        console.log(query);
-    };
-    viewbyManager() {
-        const query = "View employees by manager";
-        const queryOpt1 = `SELECT CONCAT(e2.first_name, " ", e2.last_name) AS Manager, e1.id AS EMPID, e1.first_name AS FName, e1.last_name AS LName, role.title AS Title, department.name AS Department, role.salary AS Salary
-        
-        FROM employee AS e1
-        LEFT JOIN role on e1.role_id = role.id
-        LEFT JOIN department ON role.department_id = department.id
-        INNER JOIN employee AS e2 ON e2.id=e1.manager_id
-        ORDER BY department ASC;`;
-        const queryOpt2 = `SELECT e.first_name, e.last_name, r.title, r.salary,
-        CONCAT(e1.first_name, " ", e1.last_name) as manager
-        FROM employee e
-        INNER JOIN role r ON e.role_id = r.id
-        LEFT JOIN employee e1 ON e.manager_id = e1.id
-        WHERE r.department_id = ?`;
+    //     console.log(query);
+    // };
+    // viewbyManager() {
+    //     const query = "View employees by manager";
+    //     const queryOpt1 = `SELECT CONCAT(e2.first_name, " ", e2.last_name) AS Manager, e1.id AS EMPID, e1.first_name AS FName, e1.last_name AS LName, role.title AS Title, department.name AS Department, role.salary AS Salary
 
-        console.log(query);
-    };
+    //     FROM employee AS e1
+    //     LEFT JOIN role on e1.role_id = role.id
+    //     LEFT JOIN department ON role.department_id = department.id
+    //     INNER JOIN employee AS e2 ON e2.id=e1.manager_id
+    //     ORDER BY department ASC;`;
+    //     const queryOpt2 = `SELECT e.first_name, e.last_name, r.title, r.salary,
+    //     CONCAT(e1.first_name, " ", e1.last_name) as manager
+    //     FROM employee e
+    //     INNER JOIN role r ON e.role_id = r.id
+    //     LEFT JOIN employee e1 ON e.manager_id = e1.id
+    //     WHERE r.department_id = ?`;
+
+    //     console.log(query);
+
 
     viewbyRole() {
         const query = "View employees by role";
@@ -652,10 +652,13 @@ function onMainPromptAnswer({ action }) {
             mainPrompt();
             break;
         case "Exit":
-            default:
-                console.log("Goodbye!")
-                connection.end();
+        default:
+            console.log("Goodbye!")
+            connection.end();
     };
 };
 
-module.exports = { start: start,};
+module.exports = { start: start, };
+
+let role = new Role();
+let employee = new Employee();
